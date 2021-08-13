@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Success OAuth</title>
+  </head>
+  <body>
+    <% if(!error) { %>
+      <h1>Success <%= provider %> OAuth</h1>
+      <div style="display: none;">
+        <p><b>Access Token:</b> <span id="access_token"><%= access_token %></span></p>
+        <p><b>Refresh Token:</b> <span id="refresh_token"><%= refresh_token %></span></p>
+        <p><b>Username:</b> <span id="username"><%= username %></span></p>
+        <p><b>Email:</b> <span id="email"><%= email %></span></p>
+        <% if(picture){ %>
+        <p><b>Picture:</b> <span id="picture"><%= picture %></span></p>
+        <% } %>
+      </div>
+    <% } %>
+    <% if(error) { %>
+      <h1>Error <%= provider %> OAuth</h1>
+      <div style="display: none;">
+        <p><b>Error:</b> <span id="error"><%= error %></span></p>
+      </div>
+    <% } %>
+  </body>
+</html>
