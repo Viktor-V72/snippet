@@ -1,6 +1,8 @@
 const express = require("express");
 const request = require('request');
 const localStorage = require("localStorage");
+const base64url = require('base64url');
+const XLSX = require('xlsx');
 
 const jsonBodyParser = express.json();
 const {
@@ -13,7 +15,7 @@ const {
 
 const { client_id_google, client_secret_google, port } = require('../../config.json');
 
-var redirect_uri = `https://evening-inlet-22984.herokuapp.com/api/google/callback`;
+var redirect_uri = `https://cottony-destiny-join.glitch.me/api/google/callback`;
 
 const router = express.Router();
 
@@ -89,38 +91,105 @@ router.post("/pubsub/pushNotification", jsonBodyParser, (req, res) => {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       },
       rejectUnauthorized: false,
-      qs: { startHistoryId: `${localStorage.getItem('startHistoryId')}`, labelId: ['INBOX'] },
+      qs: { startHistoryId: `${localStorage.getItem('startHistoryId')}`, labelIds: ['INBOX'] },
 
     }, function (err, resp) {
       if (err) {
         console.error(err);
       } else {
-        console.log('RESPONSE BODY', resp.body);
+        
         const json = JSON.parse(resp.body)
 
+        localStorage.setItem('messageId', `${json.history[0].messagesAdded[0].message.id}`);
+        
 
-        // console.log('json history', json.history);
+       request({
+      url: `https://gmail.googleapis.com/gmail/v1/users/me/messages/${localStorage.getItem('messageId')}`,
+      method: "GET",
+          headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      rejectUnauthorized: false,
 
-        // console.log('json history 1111', json.history[0].messages);
-    
-        // console.log('json history 1111 messages 0', json.history[0].messages[0].id);
+    }, function (err, respon) {
+      if (err) {
+        console.error(err);
+      } else {
+      
+        
+        const secondJson = JSON.parse(respon.body)
+        
+        localStorage.setItem('attachmentId', `${secondJson.payload.parts[1].body.attachmentId}`);
 
-        // localStorage.setItem('messageId', `${json.history[0].messages[0].id}`);
-        // console.log('finally', json.history[0].messages[0].id);
+        request({
+      url: `https://gmail.googleapis.com/gmail/v1/users/me/messages/${localStorage.getItem('messageId')}/attachments/${localStorage.getItem('attachmentId')}`,
+      method: "GET",
+          headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      rejectUnauthorized: false,
 
+    }, function (err, response) {
+      if (err) {
+        console.error(err);
+      } else {
+        const lastJson = JSON.parse(response.body)
+                
+         const result64 =  base64url.toBase64(lastJson.data)
+        
+         const workbook = XLSX.read(result64.replace(/_/g, "/").replace(/-/g, "+"), {type:'base64'})
 
-    //    request({
-    //   url: `https://gmail.googleapis.com/gmail/v1/users/me/messages/${localStorage.getItem('messageId')}`,
-    //   method: "GET",
+         
+         var sheet_name_list = workbook.SheetNames;
+sheet_name_list.forEach(function(y) {
+    var worksheet = workbook.Sheets[y];
+    var headers = {};
+    var data = [];
+    for(z in worksheet) {
+        if(z[0] === '!') continue;
+        //parse out the column, row, and value
+        var tt = 0;
+        for (var i = 0; i < z.length; i++) {
+            if (!isNaN(z[i])) {
+                tt = i;
+                break;
+            }
+        };
+        var col = z.substring(0,tt);
+        var row = parseInt(z.substring(tt));
+        var value = worksheet[z].v;
 
-    // }, function (err, respon) {
-    //   if (err) {
-    //     console.error(err);
-    //   } else {
-    //     console.log(localStorage.getItem('messageId'))
-    //     console.log('second response', respon.body);
-    //   }
-    //      })
+        //store header names
+        if(row == 1 && value) {
+            headers[col] = value;
+            continue;
+        }
+
+        if(!data[row]) data[row]={};
+        data[row][headers[col]] = value;
+    }
+    //drop those first two rows which are empty
+    data.shift();
+    data.shift();
+    console.log('first data:',data);
+  
+  let obj1 = data.find(o => o.Id === 21894);
+  if(obj1) {
+    console.log(obj1.Code)
+  }
+  
+  let obj2 = data.find(o => o.Id === 26894);
+  if(obj2) {
+    console.log(obj2.Code)
+  }
+  
+ 
+}); 
+      }
+         })
+        
+      }
+         })
         
         
       }
