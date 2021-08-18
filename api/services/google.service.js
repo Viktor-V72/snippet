@@ -21,7 +21,6 @@ const getGoogleAuthURL = () => {
       "https://mail.google.com/",
     ].join(" "),
   };
-
   return `${rootUrl}?${querystring.stringify(options)}`;
 };
 
@@ -87,5 +86,8 @@ const refreshToken = async ({
     return { error, error_message: `Failed to fetch Google access token` };
   }
 };
+
+
+
 
 module.exports = { getGoogleAuthURL, getGoogleUserTokens, getGoogleUser, refreshToken };

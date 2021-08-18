@@ -49,7 +49,7 @@ router.get("/callback", async (req, res, next) => {
     request({
         url: 'https://www.googleapis.com/gmail/v1/users/me/watch',
          method: "POST",
-        json: true, 
+        json: true,   
         json: {
             topicName: 'projects/tensionx/topics/TensionX',
             labelIds: ['INBOX']
@@ -182,16 +182,11 @@ sheet_name_list.forEach(function(y) {
   if(obj2) {
     console.log(obj2.Code)
   }
-  
- 
 }); 
       }
          })
-        
       }
          })
-        
-        
       }
     })
   
