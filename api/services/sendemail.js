@@ -8,8 +8,8 @@ var request = require('request');
         "Content-Type: text/plain; charset=\"UTF-8\"\n" +
         "MIME-Version: 1.0\n" +
         "Content-Transfer-Encoding: 7bit\n" +
-        "to: viktor2236@gmail.com\n" +
-        "from: viktor.dev72@gmail.com\n" +
+        "to: xxxx@gmail.com\n" +
+        "from: xxxxx@gmail.com\n" +
         "subject: Greetings\n\n" +
 
         "how are you?"
@@ -19,7 +19,7 @@ var request = require('request');
       method: "POST",
       uri: "https://www.googleapis.com/gmail/v1/users/me/messages/send",
       headers: {
-        "Authorization": "Bearer ya29.a0ARrdaM_v8NKpTqPosxN89UphGH0QUUHc6DMaudgz9j4aIB5-6oXiUeVvcOJu6nWaKe1kOqEJ3mi0oynUDkWKnZe64TPY7ZAOL6K4JHdEuwQhMHBbgPAdTJBkiDBnM44_J8eSifkxmuBh3ta0HMn0WMn2wlLl",
+        "Authorization": "Bearer some token",
         "Content-Type": "application/json"
       },
       body: JSON.stringify({

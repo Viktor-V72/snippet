@@ -11,7 +11,7 @@ const auth = new google.auth.GoogleAuth({
 //   const authClient = await authorize();
   const request = {
     // The spreadsheet to request.
-    spreadsheetId: '11O7Z4mMrSssLIM-l8yGZB0hitoyndqYkri8fS4-mxJk',  // TODO: Update placeholder value.
+    spreadsheetId: 'some id',  // TODO: Update placeholder value.
 
     // The ranges to retrieve from the spreadsheet.
     // ranges: [],  // TODO: Update placeholder value.
