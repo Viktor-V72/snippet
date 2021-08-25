@@ -3,6 +3,8 @@ const request = require('request');
 const localStorage = require("localStorage");
 const base64url = require('base64url');
 const XLSX = require('xlsx');
+const excelToJson = require('convert-excel-to-json');
+
 
 const jsonBodyParser = express.json();
 const {
@@ -49,7 +51,7 @@ router.get("/callback", async (req, res, next) => {
     request({
         url: 'https://www.googleapis.com/gmail/v1/users/me/watch',
          method: "POST",
-        json: true,   
+        json: true, 
         json: {
             topicName: 'projects/tensionx/topics/TensionX',
             labelIds: ['INBOX']
@@ -139,8 +141,20 @@ router.post("/pubsub/pushNotification", jsonBodyParser, (req, res) => {
         
          const workbook = XLSX.read(result64.replace(/_/g, "/").replace(/-/g, "+"), {type:'base64'})
 
-         
-         var sheet_name_list = workbook.SheetNames;
+      let sheet_name_list = [];
+        sheet_name_list.push(workbook.SheetNames[2]);
+        console.log('list', sheet_name_list)
+//           var sheet_name_list = workbook.SheetNames[0];
+        
+//         console.log('workbook.SheetNames:', workbook.SheetNames)
+        
+//         console.log('sworkbook.SheetNames 0 :', workbook.SheetNames[0])
+        
+         // const newAlerts = workbook.Sheets["New Alerts"];
+        // console.log('new Alerts:', newAlerts )
+     
+        
+       
 sheet_name_list.forEach(function(y) {
     var worksheet = workbook.Sheets[y];
     var headers = {};
@@ -160,7 +174,7 @@ sheet_name_list.forEach(function(y) {
         var value = worksheet[z].v;
 
         //store header names
-        if(row == 1 && value) {
+        if(row == 4 && value) {
             headers[col] = value;
             continue;
         }
@@ -169,26 +183,67 @@ sheet_name_list.forEach(function(y) {
         data[row][headers[col]] = value;
     }
     //drop those first two rows which are empty
-    data.shift();
-    data.shift();
-    console.log('first data:',data);
+    // data.shift();
+    // data.shift();
+    // console.log('first data:',data);
   
-  let obj1 = data.find(o => o.Id === 21894);
+  
+  data = data.filter(function( element ) {
+   return element.DOT !== undefined;
+});
+  
+  console.log('second data:',data);
+  
+   let obj1 = data.find(o => o.DOT === 3007814);
+  
+
+
   if(obj1) {
-    console.log(obj1.Code)
+    console.log('Legal Name 1 ', obj1['Legal Name'])
+    console.log('Basic 1', obj1.BASIC)
   }
   
-  let obj2 = data.find(o => o.Id === 26894);
-  if(obj2) {
-    console.log(obj2.Code)
-  }
+
 }); 
+       
+        
       }
          })
       }
          })
       }
     })
+  
+   var encodedMail = Buffer.from(
+        "Content-Type: text/plain; charset=\"UTF-8\"\n" +
+        "MIME-Version: 1.0\n" +
+        "Content-Transfer-Encoding: 7bit\n" +
+        "to: viktor2236@gmail.com\n" +
+        "from: viktor.dev72@gmail.com\n" +
+        "subject: Greetings\n\n" +
+
+        "how are you?"
+  ).toString("base64").replace(/\+/g, '-').replace(/\//g, '_');
+
+  request({
+      method: "POST",
+      uri: "https://www.googleapis.com/gmail/v1/users/me/messages/send",
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem('token')}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        "raw": encodedMail
+      })
+    },
+    function(err, response, body) {
+      if(err){
+        console.log(err); // Failure
+      } else {
+        console.log(body); // Success!
+      }
+    }); 
+   
   
 
   console.log('message', message)
